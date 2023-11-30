@@ -19,16 +19,16 @@ def text(link):
 def generate_response(prompt):
     context = text(link)
     if "Error" in context:
-        return context
-
-    history.append("Consider the following text as context: "+ context)
-    history.append("Question: " + prompt)
-    full_prompt = "\n".join(history)
+        return [(prompt, context)]
+    
+    full_prompt = "\n".join([h[1] for h in history]) + "\n" + context + "\nQuestion: " + prompt
     
     oll = Ollama(base_url='http://localhost:11434', model="orca-mini")
     response = oll(full_prompt)
     
-    return response
+    history.append((prompt, response))
+    
+    return [(prompt, response)] 
 
 def main():
     with gr.Blocks() as demo:
